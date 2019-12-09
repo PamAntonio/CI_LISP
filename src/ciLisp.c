@@ -205,7 +205,7 @@ RET_VAL evalSymNode(SYMBOL_AST_NODE *symbolNode, AST_NODE *parent) {
     bool found = false;
 
     while (!found) {
-        if (temp == NULL) { // wasn't found in this scope, go up a scope, look for the var there
+        if (temp == NULL) { 
             if (parent->parent != NULL) {
                 temp = pnt->symbolTable;
                 pnt = pnt->parent;
@@ -295,18 +295,18 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode) {
             parent = funcNode->opList->parent;
         }
 
-        SYMBOL_TABLE_NODE *h = NULL;
+        SYMBOL_TABLE_NODE *head0 = NULL;
         while (parent != NULL) {
             if (parent->symbolTable != NULL) {
-                h = parent->symbolTable;
+                head0 = parent->symbolTable;
                 break;
             }
             parent = parent->parent;
         }
-        while (h != NULL) {
-            if (h->type == LAMBDA_TYPE) {
-                if (strcmp(h->ident, funcNode->ident) == 0) {
-                    SYMBOL_TABLE_NODE *arg = h->val->symbolTable;
+        while (head0 != NULL) {
+            if (head0->type == LAMBDA_TYPE) {
+                if (strcmp(head0->ident, funcNode->ident) == 0) {
+                    SYMBOL_TABLE_NODE *arg = head0->val->symbolTable;
                     AST_NODE *plist = funcNode->opList;
                     while (arg != NULL) {
                         AST_NODE *argResolved = malloc(sizeof(AST_NODE));
@@ -323,11 +323,11 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode) {
                             printf("Error\n");
                         }
                     }
-                    result = eval(h->val);
-                    result.type = h->val_type;
+                    result = eval(head0->val);
+                    result.type = head0->val_type;
                 }
             }
-            h = h->next;
+            head0 = head0->next;
         }
     } else {
         if (numOfOperands == 0) {
@@ -387,14 +387,14 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode) {
                     result.type = DOUBLE_TYPE;
                 }
             }
-            AST_NODE *h = funcNode->opList;
 
-            if (numOfOperands > 2 &&
-                (funcNode->oper == SUB_OPER || funcNode->oper == DIV_OPER || funcNode->oper == REMAINDER_OPER ||
+            else if (numOfOperands>2&&(funcNode->oper == SUB_OPER || funcNode->oper == DIV_OPER || funcNode->oper == REMAINDER_OPER ||
                  funcNode->oper == POW_OPER || funcNode->oper == MAX_OPER || funcNode->oper == MIN_OPER ||
-                 funcNode->oper == HYPOT_OPER)) {
+                 funcNode->oper == HYPOT_OPER)){
                 printf("WARNING: too many parameters: %s\n", funcNames[funcNode->oper]);
             }
+
+            AST_NODE *h = funcNode->opList;
 
             switch (funcNode->oper) {
                 case SUB_OPER:
@@ -472,7 +472,6 @@ RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode) {
                         printRetVal(op1);
                         printf("\n");
 
-                        //  printRetVal(op2);
                         printType(op2);
                         result = op2;
                     } else {
