@@ -112,16 +112,17 @@ E. Task 5 - Done
         
     Process finished with exit code 0
 
-F. Task 6 - Done
+F. Task 6 - Debug
+
+ Added read function, let function does not work
  
- Added read function
+
+
+G. Task 7 - Debug
+ Added lambda function
  
-
-
-G. Task 7 - Done
-
 	Problem: Having trouble with my let function, stopped working
 
-H. Task 8 - In progress
+H. Task 8 - TODO
 
 I. Task 9 - TODO
