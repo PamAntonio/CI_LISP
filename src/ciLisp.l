@@ -6,28 +6,82 @@
     #include "ciLisp.h"
 %}
 
+letter [a-zA-Z]
+symbol {letter}+
 digit [0-9]
-int [+-]?{digit}+
-func "neg"|"abs"|"add"|"sub"|"mult"|"div"
+int_literal [+-]?{digit}+
+double_literal [+-]?{digit}+\.{digit}*
+func "neg"|"abs"|"exp"|"sqrt"|"add"|"sub"|"mult"|"div"|"remainder"|"log"|"pow"|"max"|"min"|"print"|"cbrt"|"exp2"|"hypot"|"rand"|"read"|"equal"|"less"|"greater"
 
 %%
 
-{int} {
+{double_literal} {
+    yylval.dval = strtod(yytext, NULL);
+    fprintf(stderr, "lex: DOUBLE dval = %lf\n", yylval.dval);
+    return DOUBLE;
+}
+
+{int_literal} {
     yylval.dval = strtod(yytext, NULL);
     fprintf(stderr, "lex: INT dval = %lf\n", yylval.dval);
     return INT;
 }
 
+"cond" {
+    return COND;
+}
+
+"lambda" {
+    return LAMBDA;
+}
+
 "quit" {
     return QUIT;
-    }
+}
+
+"int" {
+    yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
+    strcpy(yylval.sval, yytext);
+    fprintf(stderr, "lex: int_type sval = %s\n", yylval.sval);
+    return TYPE;
+}
+
+"double" {
+    yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
+    strcpy(yylval.sval, yytext);
+    fprintf(stderr, "lex: double_type sval = %s\n", yylval.sval);
+    return TYPE;
+}
 
 {func} {
     yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
     strcpy(yylval.sval, yytext);
     fprintf(stderr, "lex: FUNC sval = %s\n", yylval.sval);
     return FUNC;
+}
+
+"(" {
+    fprintf(stderr, "lex: LPAREN\n");
+    return LPAREN;
     }
+
+")" {
+    fprintf(stderr, "lex: RPAREN\n");
+    return RPAREN;
+    }
+
+"let" {
+        fprintf(stderr, "lex: LET\n");
+        return LET;
+}
+
+{symbol} {
+    yylval.sval = (char *) malloc(strlen(yytext)*sizeof(char)+1);
+    strcpy(yylval.sval, yytext);
+    fprintf(stderr, "lex: symbol sval = %s\n", yylval.sval);
+    return SYMBOL;
+}
+
 
 [\n] {
     fprintf(stderr, "lex: EOL\n");
@@ -35,102 +89,31 @@ func "neg"|"abs"|"add"|"sub"|"mult"|"div"
     return EOL;
     }
 
-[ \t] ; /* skip whitespace */
+[ |\t] ; /* skip whitespace */
 
 . { // anything else
     printf("ERROR: invalid character: >>%s<<\n", yytext);
-    }
+   }
 
 %%
 
 /*
- * The code below should NOT be edited except to comment or uncomment
- * the "freopen" call in the main. When this call is commented, the fprintf
- * calls to stderr will appear in red in the console. When it is uncommented,
- * they will not appear in the console.
+ * DO NOT CHANGE THE FOLLOWING CODE!
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-
-size_t readline(char **lineptr, size_t *n, FILE *stream, size_t n_terminate) {
-    char *bufptr = NULL;
-    char *p = bufptr;
-    size_t size;
-    int c;
-
-    if (lineptr == NULL) {
-        return -1;
-    }
-    if (stream == NULL) {
-        return -1;
-    }
-    if (n == NULL) {
-        return -1;
-    }
-    bufptr = *lineptr;
-    size = *n;
-
-    c = fgetc(stream);
-    if (c == EOF) {
-        return -1;
-    }
-    if (bufptr == NULL) {
-        bufptr = malloc(128);
-        if (bufptr == NULL) {
-            return -1;
-        }
-        size = 128;
-    }
-    p = bufptr;
-    while(c != EOF) {
-        if ((p - bufptr + 1 + n_terminate) > (size)) {
-            int offset = p - bufptr;
-            size = size + 128;
-            bufptr = realloc(bufptr, size);
-            if (bufptr == NULL) {
-                return -1;
-            }
-            p = bufptr + offset;
-        }
-        *p++ = c;
-        if (c == '\n') {
-            break;
-        }
-        c = fgetc(stream);
-    }
-
-    while( n_terminate > 0)
-    {
-        *p++ = '\0';
-        n_terminate--;
-    }
-
-    *n = p - bufptr;
-    bufptr = realloc(bufptr, *n);
-    *lineptr = bufptr;
-
-    return p - bufptr;
-}
-
-
 int main(void) {
 
-    freopen("/dev/null", "w", stderr);
+    freopen("/dev/null", "w", stderr); // except for this line that can be uncommented to throw away debug printouts
 
-    char *s_expr_str;
-    size_t s_expr_str_len;
-    size_t s_expr_postfix_padding = 2;
+    char *s_expr_str = NULL;
+    size_t s_expr_str_len = 0;
     YY_BUFFER_STATE buffer;
     while (true) {
         printf("\n> ");
-        s_expr_str = NULL;
-        s_expr_str_len = 0;
-        readline(&s_expr_str, &s_expr_str_len, stdin, s_expr_postfix_padding);
+        getline(&s_expr_str, &s_expr_str_len, stdin);
+        s_expr_str[s_expr_str_len++] = '\0';
+        s_expr_str[s_expr_str_len++] = '\0';
         buffer = yy_scan_buffer(s_expr_str, s_expr_str_len);
         yyparse();
         yy_delete_buffer(buffer);
     }
-
-    free(s_expr_str);
 }
