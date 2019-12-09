@@ -87,6 +87,7 @@ D. Task 4 - Done
     Process finished with exit code 0
 
 E. Task 5 - Done
+ 
  Developed eval function to allow for arbitrary parameters
  
    	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
@@ -112,10 +113,15 @@ E. Task 5 - Done
     Process finished with exit code 0
 
 F. Task 6 - Done
+ 
  Added read function
  
- 
 
-Task 7 - Done
 
-Task 8 - In progress
+G. Task 7 - Done
+
+	Problem: Having trouble with my let function, stopped working
+
+H. Task 8 - In progress
+
+I. Task 9 - TODO
