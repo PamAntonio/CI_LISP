@@ -1170,35 +1170,16 @@ RET_VAL evalFuncNode(AST_NODE *node){
 
             break;
 
-        // case CUSTOM_OPER:
-        //     result = eval(funcNode->opList);
+        case CUSTOM_OPER:
+            result = eval(funcNode->opList);
+            
+            if (!node)
+                break;
 
-        //     SYMBOL_TABLE_NODE *findLambda;
-        //     AST_NODE *lambdaFinder = node;
-        //     char *lambdaName = node->data.function.ident;
-
-        //     while (lambdaFinder != NULL){
-        //         findLambda = lambdaFinder->symbolTable;
-        //         while (findLambda != NULL){
-        //             if (!strcmp(findLambda->ident, lambdaName) && (findLambda->sym_type == LAMBDA_TYPE)){
-        //                 lambdaFinder = findLambda->val;
-        //                 STACK_NODE *argVal = createStackNodes(lambdaFinder, node->data.function.opList);
-        //                 if (argVal == NULL)
-        //                     break;
-
-        //                 attachStackNodes(lambdaFinder->argTable,argVal);
-
-        //                 result = eval(lambdaFinder);
-        //                 break;
-        //             }
-        //             findLambda = findLambda->next;
-        //         }
-        //         lambdaFinder = lambdaFinder->parent;
-        //     }
-
-        //     break;
+            break;
+            
         default:
-            printf("What?");
+            printf("What?\n");
             break;
     }
 

@@ -112,7 +112,7 @@ E. Task 5 - Done
         
     Process finished with exit code 0
 
-F. Task 6 - Debug
+F. Task 6 - Done
  Fixed retVal issue
  Fixed read function in evalFuncNode
  
@@ -132,10 +132,10 @@ F. Task 6 - Debug
     
     > quit
 
-G. Task 7 - Debug
- Added lambda function
+G. Task 7 - Todo
+    
  
-H. Task 8 - Debug
+H. Task 8 - Todo
 
 
-I. Task 9 - Debug
+I. Task 9 - Todo
