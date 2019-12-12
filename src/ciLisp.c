@@ -1312,7 +1312,6 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
                 result = eval(condAstNode->zero);
             break;
         default:
-            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
             break;
     }
     return result;
