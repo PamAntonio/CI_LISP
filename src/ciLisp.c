@@ -1321,12 +1321,12 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
 STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
 {
     if (paramList == NULL) {
-        yyerror("No parameters entered for lambda function\n");
+        yyerror("No parameters entered\n");
         return NULL;
     }
 
     if (lambdaFunc == NULL) {
-        yyerror("lambda function contains no parameters. Invalid writes somewhere\n");
+        yyerror("lambda function contains no parameters\n");
         return NULL;
     }
 
@@ -1335,7 +1335,7 @@ STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
 
     nodeSize = sizeof(STACK_NODE);
     if ((head = calloc(nodeSize, 1)) == NULL)
-        yyerror("Memory allocation failed!");
+        yyerror("Memory allocation failed");
 
     head->val = eval(paramList);
     ARG_TABLE_NODE *currArg = lambdaFunc->argTable->next;
@@ -1345,7 +1345,7 @@ STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
 
     while ((currArg != NULL) && (currOp != NULL))    {
         if ((tail->next = calloc(nodeSize, 1)) == NULL)
-            yyerror("Memory allocation failed!");
+            yyerror("Memory allocation failed");
 
         tail = tail->next;
         tail->next = NULL;
@@ -1354,10 +1354,10 @@ STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
         currOp = currOp->next;
     }
     if ((currArg == NULL) && (currOp != NULL)){
-        yyerror("Too many parameters for lambda function.\n\t\tparam ignored\n");
+        yyerror("extra parameters\n\t\t ignored\n");
     }
     else if (currArg != NULL){
-        yyerror("Too few parameters for lambda function.\n");
+        yyerror("need more parameters\n");
         while (currArg != NULL){
             if ((tail->next = calloc(nodeSize, 1)) == NULL)
                 yyerror("Memory allocation failed!");
