@@ -1023,7 +1023,50 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case EQUAL_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"equal\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL equalOp2 = eval(funcNode->opList->next);
+
+
+            switch (result.type)
+            {
+                case INT_TYPE:
+                    switch (equalOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.value.ival = (result.value.ival == equalOp2.value.ival) ? 1 : 0;
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.ival = (fabs((double) result.value.ival - equalOp2.value.dval) < BUFFER_DOUBLE) ? 1 : 0;
+                            break;
+                        default:
+                            yyerror("invalid num node type!");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (equalOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = (fabs(  result.value.dval - (double) equalOp2.value.ival) < BUFFER_DOUBLE) ? 1 : 0;
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = (fabs( result.value.dval - equalOp2.value.dval) < BUFFER_DOUBLE) ? 1 : 0;                    
+                            break;
+                        default:
+                            yyerror("invalid num node type!");
+                    }
+                    break;
+                default:
+                    yyerror("invalid num node type!");
+            }
+
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"equal\".\n\t\tOther param ignored\n");
 
@@ -1032,7 +1075,48 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case LESS_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"less\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL lessOp2 = eval(funcNode->opList->next);
+
+            switch (result.type)
+            {
+                case INT_TYPE:
+                    switch (lessOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.value.ival = (result.value.ival < lessOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.ival = ( (double) result.value.ival < lessOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (lessOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = ( result.value.dval < (double) lessOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = (result.value.dval < lessOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("invalid num node type");
+                    }
+                    break;
+                default:
+                    yyerror("invalid num node type");
+            }
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"less\".\n\t\tOther param ignored\n");
 
@@ -1041,19 +1125,78 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case GREATER_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"greater\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL greatOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (greatOp2.type){
+                        case INT_TYPE:
+                            result.value.ival = (result.value.ival > greatOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.ival = ( (double) result.value.ival > greatOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (greatOp2.type){
+                        case INT_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = ( result.value.dval > (double) greatOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = INT_TYPE;
+                            result.value.ival = (result.value.dval > greatOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+            }
+
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"greater\".\n\t\tOther param ignored\n");
 
             break;
 
-        case CUSTOM_OPER:
-            if (!funcNode->opList)
-               break;
-            
+        // case CUSTOM_OPER:
+        //     result = eval(funcNode->opList);
 
+        //     SYMBOL_TABLE_NODE *findLambda;
+        //     AST_NODE *lambdaFinder = node;
+        //     char *lambdaName = node->data.function.ident;
 
-            break;
+        //     while (lambdaFinder != NULL){
+        //         findLambda = lambdaFinder->symbolTable;
+        //         while (findLambda != NULL){
+        //             if (!strcmp(findLambda->ident, lambdaName) && (findLambda->sym_type == LAMBDA_TYPE)){
+        //                 lambdaFinder = findLambda->val;
+        //                 STACK_NODE *argVal = createStackNodes(lambdaFinder, node->data.function.opList);
+        //                 if (argVal == NULL)
+        //                     break;
+
+        //                 attachStackNodes(lambdaFinder->argTable,argVal);
+
+        //                 result = eval(lambdaFinder);
+        //                 break;
+        //             }
+        //             findLambda = findLambda->next;
+        //         }
+        //         lambdaFinder = lambdaFinder->parent;
+        //     }
+
+        //     break;
         default:
             printf("What?");
             break;
@@ -1064,7 +1207,6 @@ RET_VAL evalFuncNode(AST_NODE *node){
 
 RET_VAL evalSymbolNode(AST_NODE *symbolNode)
 {
-
     if (!symbolNode)
         return (RET_VAL){DOUBLE_TYPE, NAN};
 
@@ -1081,7 +1223,6 @@ RET_VAL evalSymbolNode(AST_NODE *symbolNode)
         while (currSymbol != NULL){
             if (!strcmp(symbol, currSymbol->ident) && (currSymbol->sym_type == VARIABLE_TYPE)){
                 result = evalSymbolNodeHelper(currSymbol);
-
                 return result;
             }
             currSymbol = currSymbol->next;
@@ -1089,20 +1230,14 @@ RET_VAL evalSymbolNode(AST_NODE *symbolNode)
 
         currArg = currNode->argTable;
         while (currArg != NULL){
-            if (!strcmp(symbol, currArg->ident))
-            {
+            if (!strcmp(symbol, currArg->ident)){
                 result = currArg->argVal;
-
                 return result;
             }
-
             currArg = currArg->next;
         } 
-
-
         currNode = currNode->parent;
     } 
-
     return result;
 }
 
@@ -1189,7 +1324,6 @@ void printRetVal(RET_VAL val){
             yyerror("Invalid num node type");
     }
 }
-
 
 void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals){
     ARG_TABLE_NODE *currArg = lambdaArgs;
