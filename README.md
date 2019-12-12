@@ -126,12 +126,20 @@ F. Task 6 - Done
     read :=5.175
     print: 3, 5.00, 10, 5.17,
     
-    This is the last item printed
+    This is the last item, printed
     
     Type: Double 
     5.175000
     
-    > quit
+    > ((let (a 0)) (cond (less (rand) 0.5) (add a 1) (sub a 1)))
+    Type: Integer 
+    -1
+    
+    > ((let (myA (read))(myB (rand)))(cond (less myA myB) (print myA) (print myB)))
+    read :=4
+    print: 0.46,
+    Type: Double 
+    0.458650
 
 G. Task 7 - Todo
     
