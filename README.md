@@ -1,13 +1,14 @@
 #Author: Deanne Pamela Antonio
+
 #Project: ciLisp 
 
 Through the course of this project, the author will implement an interpreter for *CI LISP*, a *Lisp*-like language.
 
-The project is divided into tasks (which should be done sequentially).
 
 A. Task 1 - Done
 
  Tokenization, Parsing and Evaluation of arithmetics in Cambridge Polish Notation
+ Finished all TODO tasks.
 
 	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
 
@@ -29,7 +30,7 @@ A. Task 1 - Done
 
 B. Task 2 - Done
 
- Implemented evalSymbolNode, createSymbolTable
+ Implemented evalSymbolNode, createSymbolTableNode, and let token
 
 	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
 
@@ -142,6 +143,8 @@ F. Task 6 - Done
     0.458650
 
 G. Task 7 - Done
+
+ Let function extended to take in lambda
 
 
     /Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/CI_LISP/cmake-build-debug/cilisp
