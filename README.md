@@ -124,6 +124,7 @@ F. Task 6 - Debug
     read :=10
     read :=5.175
     print: 3, 5.00, 10, 5.17,
+    
     This is the last item printed
     
     Type: Double 

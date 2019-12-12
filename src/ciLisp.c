@@ -963,7 +963,7 @@ RET_VAL evalFuncNode(AST_NODE *node){
             puts(buffer);
 
             if (funcNode->opList->next != NULL)
-                printf("This is the last item printed\n\n");
+                printf("\nThis is the last item, printed\n\n");
 
             break;
 
@@ -1011,12 +1011,12 @@ RET_VAL evalFuncNode(AST_NODE *node){
             break;
 
         case RAND_OPER:
-            if (!funcNode->opList)
-               break;
-            
+            result = eval(funcNode->opList);
+            RET_VAL random = {DOUBLE_TYPE, {(double) rand() / RAND_MAX}};
 
-            if (funcNode->opList->next != NULL)
-                yyerror("Too many parameters for \"rand\".\n\t\tOther param ignored\n");
+            result = random;
+            node->type = NUM_NODE_TYPE;
+            node->data.number = result;
 
             break;
 
