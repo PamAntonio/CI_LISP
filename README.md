@@ -113,6 +113,7 @@ E. Task 5 - Done
     Process finished with exit code 0
 
 F. Task 6 - Done
+
  Fixed retVal issue
  Fixed read function in evalFuncNode
  
