@@ -985,10 +985,10 @@ void printRetVal(RET_VAL val){
     switch (val.type)
     {
         case INT_TYPE:
-            printf("Int Type: %ld\n", val.value.ival);
+            printf("Type: Integer \n\n%ld\n", val.value.ival);
             break;
         case DOUBLE_TYPE:
-            printf("Double Type: %lf\n", val.value.dval);
+            printf("Type: Double \n\n%lf\n", val.value.dval);
             break;
         default:
             yyerror("Invalid num node type");
@@ -997,19 +997,14 @@ void printRetVal(RET_VAL val){
 }
 
 
-void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals)
-{
-
+void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals){
     ARG_TABLE_NODE *currArg = lambdaArgs;
     STACK_NODE *currStackNode = paramVals;
     STACK_NODE *prevStackNode;
 
-    while ((currArg != NULL))
-    {
+    while ((currArg != NULL)){
         prevStackNode = currStackNode;
-
         currArg->argVal = currStackNode->val;
-
         currArg = currArg->next;
         currStackNode = currStackNode->next;
         free(prevStackNode);

@@ -113,16 +113,13 @@ E. Task 5 - Done
     Process finished with exit code 0
 
 F. Task 6 - Debug
-
- Added read function, let function does not work
- 
+ Fixing read function in evalFuncNode
 
 
 G. Task 7 - Debug
  Added lambda function
  
-	Problem: Having trouble with my let function, stopped working
+H. Task 8 - Debug
 
-H. Task 8 - TODO
 
-I. Task 9 - TODO
+I. Task 9 - Debug
