@@ -1172,9 +1172,35 @@ RET_VAL evalFuncNode(AST_NODE *node){
 
         case CUSTOM_OPER:
             result = eval(funcNode->opList);
-            
+            char *lambdaName = node->data.function.ident;
+            SYMBOL_TABLE_NODE *lambdaSeek;
+            AST_NODE *lambdaSeekFunc = node;
+
             if (!node)
                 break;
+
+            while (lambdaSeekFunc != NULL)
+            {
+                lambdaSeek = lambdaSeekFunc->symbolTable;
+                while (lambdaSeek != NULL)
+                {
+                    if (!strcmp(lambdaSeek->ident, lambdaName) && (lambdaSeek->sym_type == LAMBDA_TYPE))
+                    {
+                        lambdaSeekFunc = lambdaSeek->val;
+                        STACK_NODE *argValues = createStackNodes(lambdaSeekFunc, node->data.function.opList);
+                        if (argValues == NULL)
+                            return (RET_VAL){DOUBLE_TYPE, NAN};
+
+                        attachStackNodes(lambdaSeekFunc->argTable, argValues);
+                        result = eval(lambdaSeekFunc);
+                        return result;
+                    }
+                    lambdaSeek = lambdaSeek->next;
+                } 
+
+                lambdaSeekFunc = lambdaSeekFunc->parent;
+            } 
+
 
             break;
             
@@ -1292,18 +1318,58 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
     return result;
 }
 
-
-void printRetVal(RET_VAL val){
-    switch (val.type){
-        case INT_TYPE:
-            printf("Type: Integer \n%ld\n", val.value.ival);
-            break;
-        case DOUBLE_TYPE:
-            printf("Type: Double \n%lf\n", val.value.dval);
-            break;
-        default:
-            yyerror("Invalid num node type");
+STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
+{
+    if (paramList == NULL) {
+        yyerror("No parameters entered for lambda function\n");
+        return NULL;
     }
+
+    if (lambdaFunc == NULL) {
+        yyerror("lambda function contains no parameters. Invalid writes somewhere\n");
+        return NULL;
+    }
+
+    STACK_NODE *head;
+    size_t nodeSize;
+
+    nodeSize = sizeof(STACK_NODE);
+    if ((head = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+
+    head->val = eval(paramList);
+    ARG_TABLE_NODE *currArg = lambdaFunc->argTable->next;
+    AST_NODE * currOp = paramList->next;
+
+    STACK_NODE *tail = head;
+
+    while ((currArg != NULL) && (currOp != NULL))    {
+        if ((tail->next = calloc(nodeSize, 1)) == NULL)
+            yyerror("Memory allocation failed!");
+
+        tail = tail->next;
+        tail->next = NULL;
+        tail->val = eval(currOp);
+        currArg = currArg->next;
+        currOp = currOp->next;
+    }
+    if ((currArg == NULL) && (currOp != NULL)){
+        yyerror("Too many parameters for lambda function.\n\t\tparam ignored\n");
+    }
+    else if (currArg != NULL){
+        yyerror("Too few parameters for lambda function.\n");
+        while (currArg != NULL){
+            if ((tail->next = calloc(nodeSize, 1)) == NULL)
+                yyerror("Memory allocation failed!");
+
+            tail = tail->next;
+            tail->next = NULL;
+            tail->val = (RET_VAL) {INT_TYPE, 1};
+            currArg = currArg->next;
+        }
+    }
+
+    return head;
 }
 
 void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals){
@@ -1319,3 +1385,18 @@ void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals){
         free(prevStackNode);
     }
 }
+
+void printRetVal(RET_VAL val){
+    switch (val.type){
+        case INT_TYPE:
+            printf("Type: Integer \n%ld\n", val.value.ival);
+            break;
+        case DOUBLE_TYPE:
+            printf("Type: Double \n%lf\n", val.value.dval);
+            break;
+        default:
+            yyerror("Invalid num node type");
+    }
+}
+
+
