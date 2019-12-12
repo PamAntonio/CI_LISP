@@ -1372,9 +1372,9 @@ STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList)
     return head;
 }
 
-void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals){
+void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVal){
     ARG_TABLE_NODE *currArg = lambdaArgs;
-    STACK_NODE *currStackNode = paramVals;
+    STACK_NODE *currStackNode = paramVal;
     STACK_NODE *prevStackNode;
 
     while ((currArg != NULL)){

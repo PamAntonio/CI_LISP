@@ -143,6 +143,7 @@ F. Task 6 - Done
 
 G. Task 7 - Done
 
+ 
     /Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/CI_LISP/cmake-build-debug/cilisp
     
     > ((let (double myFunc lambda (x y) (mult (add x 5) (sub y 2)))) (sub (myFunc 3 5) 2))
