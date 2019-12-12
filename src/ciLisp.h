@@ -161,8 +161,9 @@ RET_VAL evalFuncNode(AST_NODE *node);
 RET_VAL evalSymbolNode(AST_NODE *symbolNode);
 RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol);
 RET_VAL evalCondNode(COND_AST_NODE *condAstNode);
-void printRetVal(RET_VAL val);
+
 STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList);
 void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVal);
 
+void printRetVal(RET_VAL val);
 #endif
