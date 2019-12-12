@@ -518,10 +518,10 @@ RET_VAL evalFuncNode(AST_NODE *node){
                     case DOUBLE_TYPE:
                         switch (subOp2.type) {
                             case INT_TYPE:
-                                result.value.dval += (double) subOp2.value.ival;
+                                result.value.dval -= (double) subOp2.value.ival;
                                 break;
                             case DOUBLE_TYPE:
-                                result.value.dval += subOp2.value.dval;
+                                result.value.dval -= subOp2.value.dval;
                                 break;
                             default:
                                 yyerror("Invalid num node type");
@@ -539,8 +539,44 @@ RET_VAL evalFuncNode(AST_NODE *node){
                break;
             
 
-            if (funcNode->opList->next != NULL)
-                yyerror("Too many parameters for \"mult\".\n\t\tOther param ignored\n");
+            result = eval(funcNode->opList);
+            AST_NODE *multCurrOp = funcNode->opList->next;
+            RET_VAL multOp2; 
+        
+            while (multCurrOp != NULL){
+                multOp2 = eval(multCurrOp);
+                switch (result.type) {
+                    case INT_TYPE:
+                        switch (multOp2.type) {
+                            case INT_TYPE:
+                                result.value.ival *= multOp2.value.ival;
+                                break;
+                            case DOUBLE_TYPE:
+                                result.type = DOUBLE_TYPE;
+                                result.value.dval = (double)result.value.ival * multOp2.value.dval;
+                                break;
+                            default:
+                                yyerror("Invalid num node type");
+                        }
+                        break;
+                    case DOUBLE_TYPE:
+                        switch (multOp2.type) {
+                            case INT_TYPE:
+                                result.value.dval *= (double) multOp2.value.ival;
+                                break;
+                            case DOUBLE_TYPE:
+                                result.value.dval *= multOp2.value.dval;
+                                break;
+                            default:
+                                yyerror("Invalid num node type");
+                        }
+                        break;
+                    default:
+                        yyerror("Invalid num noded type");
+                } 
+                multCurrOp = multCurrOp->next;
+            } 
+            
             break;
 
         case DIV_OPER:
