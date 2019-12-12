@@ -538,6 +538,10 @@ RET_VAL evalFuncNode(AST_NODE *node){
             if (!funcNode->opList)
                break;
             
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"mult\".\n");
+                break;
+            }
 
             result = eval(funcNode->opList);
             AST_NODE *multCurrOp = funcNode->opList->next;
@@ -582,7 +586,12 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case DIV_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"div\".\n");
+                break;
+            }
+
             result = eval(funcNode->opList);
             AST_NODE *divCurrOP = funcNode->opList->next;
             RET_VAL divOp2; 
@@ -625,16 +634,68 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case REMAINDER_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"remainder\".\n");
+                break;
+            }
+
+            result = eval(funcNode->opList);
+            RET_VAL remOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (remOp2.type){
+                        case INT_TYPE:
+                            result.value.ival = result.value.ival % remOp2.value.ival;
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = fmod((double) result.value.ival, remOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (remOp2.type){
+                        case INT_TYPE:
+                            result.value.dval = fmod(result.value.dval, (double) remOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.dval = fmod(result.value.dval, remOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }
 
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"remainder\".\n\t\tOther param ignored\n");
 
             break;
+
+
         case LOG_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            result = eval(funcNode->opList);
+            switch (result.type){
+                case INT_TYPE:
+                    result.type = DOUBLE_TYPE;
+                    result.value.dval = log((double)result.value.ival);
+                    break;
+                case DOUBLE_TYPE:
+                    result.value.dval = log(result.value.dval);
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }     
+
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"log\".\n\t\tOther param ignored\n");
             break;
@@ -642,7 +703,45 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case POW_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"pow\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL powOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (powOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.value.ival = lround(pow( (double) result.value.ival, (double) powOp2.value.ival));
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = pow((double) result.value.ival, powOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (powOp2.type){
+                        case INT_TYPE:
+                            result.value.dval = pow(result.value.dval, (double) powOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.dval = pow( result.value.dval, powOp2.value.dval );
+                            break;
+                        default:
+                            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+            }
 
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"pow\".\n\t\tOther param ignored\n");
@@ -808,20 +907,16 @@ RET_VAL evalSymbolNode(AST_NODE *symbolNode)
 }
 
 
-RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol)
-{
-
+RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol){
     if (!symbol)
         return (RET_VAL){DOUBLE_TYPE, NAN};
 
     RET_VAL result = eval(symbol->val);
-    switch (symbol->val_type)
-    {
+    switch (symbol->val_type){
         case NO_TYPE:
             return result;
         case INT_TYPE:
-            switch (result.type)
-            {
+            switch (result.type){
                 case INT_TYPE:
                     break;
                 case DOUBLE_TYPE:
@@ -856,9 +951,7 @@ RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol)
 }
 
 
-RET_VAL evalCondNode(COND_AST_NODE *condAstNode)
-{
-
+RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
     if (!condAstNode)
         return (RET_VAL){DOUBLE_TYPE, NAN};
 
@@ -888,10 +981,7 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode)
 }
 
 
-void printRetVal(RET_VAL val)
-{
-
-
+void printRetVal(RET_VAL val){
     switch (val.type)
     {
         case INT_TYPE:
@@ -901,7 +991,7 @@ void printRetVal(RET_VAL val)
             printf("Double Type: %lf\n", val.value.dval);
             break;
         default:
-            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+            yyerror("Invalid num node type");
     }
 
 }
