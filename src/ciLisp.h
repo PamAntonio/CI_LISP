@@ -1,5 +1,10 @@
+// Deanne Pamela Antonio
+// ciLisp Header 
+
 #ifndef __cilisp_h_
 #define __cilisp_h_
+#define BUFFER_DOUBLE 0.000001
+#define CHAR_BUFFER 128
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +12,6 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include <ctype.h>
 
 #include "ciLispParser.h"
 
@@ -45,6 +49,7 @@ typedef enum oper {
 
 OPER_TYPE resolveFunc(char *);
 
+
 typedef enum {
     NUM_NODE_TYPE,
     FUNC_NODE_TYPE,
@@ -52,97 +57,117 @@ typedef enum {
     COND_NODE_TYPE
 } AST_NODE_TYPE;
 
+
 typedef enum {
     INT_TYPE,
-    DOUBLE_TYPE
+    DOUBLE_TYPE,
+    NO_TYPE
 } NUM_TYPE;
+
+typedef enum {
+    VARIABLE_TYPE,
+    LAMBDA_TYPE
+} SYMBOL_TYPE;
+
+NUM_TYPE resolveNum(char *);
 
 typedef struct {
     NUM_TYPE type;
-    double value;
+    union{
+        double dval;
+        long ival;
+    } value;
 } NUM_AST_NODE;
+
 typedef NUM_AST_NODE RET_VAL;
 
 typedef struct {
     OPER_TYPE oper;
-    char *ident;
+    char* ident; 
     struct ast_node *opList;
 } FUNC_AST_NODE;
+
+typedef struct symbol_table_node {
+    SYMBOL_TYPE sym_type;
+    NUM_TYPE val_type;
+    char *ident;
+    struct ast_node *val;
+    struct symbol_table_node *next;
+} SYMBOL_TABLE_NODE;
 
 typedef struct symbol_ast_node {
     char *ident;
 } SYMBOL_AST_NODE;
 
-typedef enum {
-    VARIABLE_TYPE, LAMBDA_TYPE, ARG_TYPE
-} SYMBOL_TYPE;
-
-typedef struct stack_node {
-    struct ast_node *val;
-    struct stack_node *next;
-} STACK_NODE;
-
-typedef struct symbol_table_node {
-    SYMBOL_TYPE type;
-    NUM_TYPE val_type;
-    char *ident;
-    struct ast_node *val;
-    STACK_NODE *stack;
-    struct symbol_table_node *next;
-} SYMBOL_TABLE_NODE;
-
 typedef struct {
-    struct ast_node *cond;
-    struct ast_node *tru;
-    struct ast_node *fls;
+    struct ast_node *condNode;
+    struct ast_node *nonZero; 
+    struct ast_node *zero; 
 } COND_AST_NODE;
 
 typedef struct ast_node {
     AST_NODE_TYPE type;
     SYMBOL_TABLE_NODE *symbolTable;
+    struct arg_table_node *argTable;
     struct ast_node *parent;
     union {
         NUM_AST_NODE number;
         FUNC_AST_NODE function;
-        SYMBOL_AST_NODE symbol;
         COND_AST_NODE condition;
+        SYMBOL_AST_NODE symbol;
     } data;
     struct ast_node *next;
 } AST_NODE;
+
+AST_NODE *newNode(AST_NODE_TYPE type);
+
+typedef struct stack_node {
+    RET_VAL val;
+    struct stack_node *next;
+} STACK_NODE;
+
+typedef struct arg_table_node {
+    char *ident;
+    RET_VAL argVal;
+    struct arg_table_node *next;
+} ARG_TABLE_NODE;
 
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
 
 AST_NODE *createFunctionNode(char *funcName, AST_NODE *op1);
 
+AST_NODE *createSymbolNode(char *ident);
+
+AST_NODE *sExprLink(AST_NODE *newNode, AST_NODE *head);
+
+AST_NODE *astLink(SYMBOL_TABLE_NODE *letList, AST_NODE *op);
+
+SYMBOL_TABLE_NODE *createSymbolTableNode(AST_NODE *val, char *type, char *ident);
+
+SYMBOL_TABLE_NODE *letLink(SYMBOL_TABLE_NODE *head, SYMBOL_TABLE_NODE *newVal);
+
+AST_NODE *createCondition(AST_NODE *condExpr, AST_NODE *nonZero, AST_NODE *zero);
+
+ARG_TABLE_NODE *createArgTable(char *headName, ARG_TABLE_NODE *list);
+
+SYMBOL_TABLE_NODE *createLambdaSymbolTableNode(AST_NODE *val, char *type, char *ident, ARG_TABLE_NODE *argList);
+
 void freeNode(AST_NODE *node);
 
 RET_VAL eval(AST_NODE *node);
 RET_VAL evalNumNode(NUM_AST_NODE *numNode);
-RET_VAL evalFuncNode(FUNC_AST_NODE *funcNode);
+RET_VAL evalFuncNode(AST_NODE *node);
 
-RET_VAL evalSymNode(SYMBOL_AST_NODE *symbolNode, AST_NODE *parent);
+RET_VAL evalSymbolNode(AST_NODE *symbolNode);
 
-AST_NODE *createSymbolNode(char *ident);
+RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol);
 
-SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *ident, AST_NODE *sexpr);
-
-AST_NODE *linkSymbolTable(SYMBOL_TABLE_NODE *symTable, AST_NODE *node);
-
-SYMBOL_TABLE_NODE *addAtHead(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *element);
-
-AST_NODE *linkFunNodeList(AST_NODE *newItem, AST_NODE *list);
-
-AST_NODE *createConditionalNode(AST_NODE *condition, AST_NODE *doOne, AST_NODE *doZero);
-
-RET_VAL evalConditionNode(COND_AST_NODE *conditionNode);
-
-RET_VAL readNum();
-
-SYMBOL_TABLE_NODE *linkArgList(char *addition, SYMBOL_TABLE_NODE *list);
-
-SYMBOL_TABLE_NODE *createFuncNode(char *type, char *identifier, SYMBOL_TABLE_NODE *args, AST_NODE *sexpr);
+RET_VAL evalCondNode(COND_AST_NODE *condAstNode);
 
 void printRetVal(RET_VAL val);
 
-void printType(RET_VAL val);
+STACK_NODE *createStackNodes(AST_NODE *lambdaFunc, AST_NODE *paramList);
+
+void attachStackNodes(ARG_TABLE_NODE *lambdaArgs, STACK_NODE *paramVals);
+
 #endif
