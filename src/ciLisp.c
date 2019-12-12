@@ -572,7 +572,7 @@ RET_VAL evalFuncNode(AST_NODE *node){
                         }
                         break;
                     default:
-                        yyerror("Invalid num noded type");
+                        yyerror("Invalid num node type");
                 } 
                 multCurrOp = multCurrOp->next;
             } 
@@ -583,10 +583,43 @@ RET_VAL evalFuncNode(AST_NODE *node){
             if (!funcNode->opList)
                break;
             
-
-
-            if (funcNode->opList->next != NULL)
-                yyerror("Too many parameters for \"div\".\n\t\tOther param ignored\n");
+            result = eval(funcNode->opList);
+            AST_NODE *divCurrOP = funcNode->opList->next;
+            RET_VAL divOp2; 
+        
+            while (divCurrOP != NULL){
+                divOp2 = eval(divCurrOP);
+                switch (result.type) {
+                    case INT_TYPE:
+                        switch (divOp2.type) {
+                            case INT_TYPE:
+                                result.value.ival /= divOp2.value.ival;
+                                break;
+                            case DOUBLE_TYPE:
+                                result.type = DOUBLE_TYPE;
+                                result.value.dval = (double)result.value.ival / divOp2.value.dval;
+                                break;
+                            default:
+                                yyerror("Invalid num node type");
+                        }
+                        break;
+                    case DOUBLE_TYPE:
+                        switch (divOp2.type) {
+                            case INT_TYPE:
+                                result.value.dval /= (double) divOp2.value.ival;
+                                break;
+                            case DOUBLE_TYPE:
+                                result.value.dval /= divOp2.value.dval;
+                                break;
+                            default:
+                                yyerror("Invalid num node type");
+                        }
+                        break;
+                    default:
+                        yyerror("Invalid num node type");
+                } 
+                divCurrOP = divCurrOP->next;
+            } 
             break;
 
         case REMAINDER_OPER:
