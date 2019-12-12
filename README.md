@@ -53,7 +53,7 @@ B. Task 2 - Done
 	
 C. Task 3 - Done
  
- Made some changes to the eval function for the symbol type to check for precision loss
+ Made some changes to the evalSymbolNode to check for precision loss
  
  	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
  
