@@ -737,11 +737,11 @@ RET_VAL evalFuncNode(AST_NODE *node){
                             result.value.dval = pow( result.value.dval, powOp2.value.dval );
                             break;
                         default:
-                            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                            yyerror("Invalid num node type");
                     }
                     break;
                 default:
-                    yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    yyerror("Invalid num node type");
             }
 
             if (funcNode->opList->next != NULL)
@@ -751,7 +751,44 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case MAX_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"max\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL maxOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (maxOp2.type){
+                        case INT_TYPE:
+                            result.value.ival = lround( fmax( (double) result.value.ival, (double) maxOp2.value.ival));
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = fmax((double) result.value.ival, maxOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (maxOp2.type){
+                        case INT_TYPE:
+                            result.value.dval = fmax(result.value.dval, (double) maxOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.dval = fmax( result.value.dval, maxOp2.value.dval );
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"max\".\n\t\tOther param ignored\n");
 
@@ -761,6 +798,44 @@ RET_VAL evalFuncNode(AST_NODE *node){
             if (!funcNode->opList)
                break;
             
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"min\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL minOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (minOp2.type){
+                        case INT_TYPE:
+                            result.value.ival = lround( fmin( (double) result.value.ival, (double) minOp2.value.ival));
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = fmin((double) result.value.ival, minOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (minOp2.type){
+                        case INT_TYPE:
+                            result.value.dval = fmin(result.value.dval, (double) minOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.dval = fmin( result.value.dval, minOp2.value.dval );
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }
+
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"min\".\n\t\tOther param ignored\n");
 
@@ -770,6 +845,18 @@ RET_VAL evalFuncNode(AST_NODE *node){
             if (!funcNode->opList)
                break;
             
+            result = eval(funcNode->opList);
+            switch (result.type){
+                case INT_TYPE:
+                    result.type = DOUBLE_TYPE;
+                    result.value.dval = exp2((double)result.value.ival);
+                    break;
+                case DOUBLE_TYPE:
+                    result.value.dval = exp2(result.value.dval);
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }     
 
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"exp2\".\n\t\tOther param ignored\n");
@@ -778,7 +865,19 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case CBRT_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            result = eval(funcNode->opList);
+            switch (result.type){
+                case INT_TYPE:
+                    result.type = DOUBLE_TYPE;
+                    result.value.dval = cbrt((double)result.value.ival);
+                    break;
+                case DOUBLE_TYPE:
+                    result.value.dval = cbrt(result.value.dval);
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }     
 
             if (funcNode->opList->next != NULL)
                 yyerror("Too many parameters for \"cbrt\".\n\t\tOther param ignored\n");
@@ -787,8 +886,48 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case HYPOT_OPER:
             if (!funcNode->opList)
                break;
-            
-            if (funcNode->opList->next != NULL)
+
+            else if (!funcNode->opList->next){
+                yyerror("Too few parameters for \"hypot\".\n");
+                break;
+            }            
+
+            result = eval(funcNode->opList);
+            RET_VAL hypotOp2 = eval(funcNode->opList->next);
+
+            switch (result.type){
+                case INT_TYPE:
+                    switch (hypotOp2.type)
+                    {
+                        case INT_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = hypot( (double) result.value.ival, (double) hypotOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.type = DOUBLE_TYPE;
+                            result.value.dval = hypot( (double) result.value.ival, hypotOp2.value.dval);
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                case DOUBLE_TYPE:
+                    switch (hypotOp2.type){
+                        case INT_TYPE:
+                            result.value.dval = hypot( result.value.dval, (double) hypotOp2.value.ival);
+                            break;
+                        case DOUBLE_TYPE:
+                            result.value.dval = hypot( result.value.dval, hypotOp2.value.dval );
+                            break;
+                        default:
+                            yyerror("Invalid num node type");
+                    }
+                    break;
+                default:
+                    yyerror("Invalid num node type");
+            }
+
+            if (funcNode->opList->next->next != NULL)
                 yyerror("Too many parameters for \"hypot\".\n\t\tOther param ignored\n");
 
             break;
@@ -796,19 +935,79 @@ RET_VAL evalFuncNode(AST_NODE *node){
         case PRINT_OPER:
             if (!funcNode->opList)
                break;
-            
+
+            result = eval(funcNode->opList);
+            AST_NODE *printCurrOp = funcNode->opList;
+            char buffer[CHAR_BUFFER];
+            int index = 0;
+
+            while (printCurrOp != NULL)
+            {
+                result = eval(printCurrOp);
+
+                switch (result.type) {
+                    case INT_TYPE:
+                        index += snprintf(buffer + index, CHAR_BUFFER - index, " %ld,", result.value.ival);
+                        break;
+                    case DOUBLE_TYPE:
+                        index += snprintf(buffer + index, CHAR_BUFFER - index, " %.2lf,", result.value.dval);
+                        break;
+                    default:
+                        yyerror("invalid num node type!\n");
+                }
+
+                printCurrOp = printCurrOp->next;
+            }
+
+            printf("print:");
+            puts(buffer);
+
             if (funcNode->opList->next != NULL)
-                yyerror("Too many parameters for \"print\".\n\t\tOther param ignored\n");
+                printf("This is the last item printed\n\n");
 
             break;
 
         case READ_OPER:
-            if (!funcNode->opList)
-               break;
-            
+            result = eval(funcNode->opList);
+            char numStr[CHAR_BUFFER];
+            bool isDouble = false;
 
-            if (funcNode->opList->next != NULL)
-                yyerror("Too many parameters for \"read\".\n\t\tOther param ignored\n");
+            printf("read :=");
+            scanf("%s", numStr);
+            getchar();
+
+            for (int i = 0; numStr[i] != '\0'; ++i) {
+                switch (numStr[i])
+                {
+                    case '0'...'9':
+                        break;
+                    case '.':
+                        if (!isDouble){
+                            isDouble = true;
+                            break;
+                        }
+                    case '-':
+                        if (i == 0)
+                            break;
+                    default:
+                        yyerror("Invalid input\n");
+                        node->type = NUM_NODE_TYPE;
+                        node->data.number = result;
+                        break;
+                }
+            }
+
+            if (isDouble)
+                result.value.dval = strtod(numStr, NULL);
+            
+            else{
+                result.type = INT_TYPE;
+                result.value.ival = strtol(numStr, NULL, 10);
+            }
+            
+            node->type = NUM_NODE_TYPE;
+            node->data.number = result;
+
             break;
 
         case RAND_OPER:

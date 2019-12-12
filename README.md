@@ -88,7 +88,7 @@ D. Task 4 - Done
 
 E. Task 5 - Done
  
- Developed eval function to allow for arbitrary parameters
+ Developed eval function to allow for arbitrary parameters, had trouble with printRetVal
  
    	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
    	
@@ -113,8 +113,23 @@ E. Task 5 - Done
     Process finished with exit code 0
 
 F. Task 6 - Debug
- Fixing read function in evalFuncNode
-
+ Fixed retVal issue
+ Fixed read function in evalFuncNode
+ 
+    /Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/CI_LISP/cmake-build-debug/cilisp
+    
+    > ((let (int a (read)) (double b (read)) (c (read)) (d (read))) (print a b c d))
+    read :=3
+    read :=5.0
+    read :=10
+    read :=5.175
+    print: 3, 5.00, 10, 5.17,
+    This is the last item printed
+    
+    Type: Double 
+    5.175000
+    
+    > quit
 
 G. Task 7 - Debug
  Added lambda function
