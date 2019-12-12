@@ -920,12 +920,12 @@ RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol){
                 case INT_TYPE:
                     break;
                 case DOUBLE_TYPE:
-                    printf("WARNING: precision loss in the assignment for variable \"%s\"\n", symbol->ident);
+                    printf("WARNING: precision loss for assignment \'%s\'\n", symbol->ident);
                     result.type = INT_TYPE;
                     result.value.ival = lround(result.value.dval);
                     break;
                 default:
-                    yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    yyerror("Invalid num node type");
             }
             break;
 
@@ -939,14 +939,13 @@ RET_VAL evalSymbolNodeHelper(SYMBOL_TABLE_NODE *symbol){
                 case DOUBLE_TYPE:
                     break;
                 default:
-                    yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+                    yyerror("Invalid num node type");
             }
             break;
 
         default:
-            yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
+            yyerror("Invalid num node type");
     } 
-
     return result;
 }
 
@@ -957,8 +956,7 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
 
     RET_VAL result = eval(condAstNode->condNode);
 
-    switch (result.type)
-    {
+    switch (result.type){
         case INT_TYPE:
             if (result.value.ival)
                 result = eval(condAstNode->nonZero);
@@ -975,25 +973,21 @@ RET_VAL evalCondNode(COND_AST_NODE *condAstNode){
             yyerror("Invalid NUM_NODE_TYPE, probably invalid writes somewhere!");
             break;
     }
-
     return result;
-
 }
 
 
 void printRetVal(RET_VAL val){
-    switch (val.type)
-    {
+    switch (val.type){
         case INT_TYPE:
-            printf("Type: Integer \n\n%ld\n", val.value.ival);
+            printf("Type: Integer \n%ld\n", val.value.ival);
             break;
         case DOUBLE_TYPE:
-            printf("Type: Double \n\n%lf\n", val.value.dval);
+            printf("Type: Double \n%lf\n", val.value.dval);
             break;
         default:
             yyerror("Invalid num node type");
     }
-
 }
 
 
