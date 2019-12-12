@@ -8,6 +8,7 @@ Through the course of this project, the author will implement an interpreter for
 A. Task 1 - Done
 
  Tokenization, Parsing and Evaluation of arithmetics in Cambridge Polish Notation
+ 
  Finished all TODO tasks.
 
 	/Users/carelessluck/Desktop/Pamela_Antonio_CI_LISP/Pamela_Antonio_CILISP/cmake-build-debug/cilisp
